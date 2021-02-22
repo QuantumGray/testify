@@ -16,12 +16,14 @@ import 'package:flutter_test/flutter_test.dart';
 /// write your own [TestCaseExecutor] by implementing it
 
 class TestCaseExecutor<T> {
-  const TestCaseExecutor(this.testCaseList);
+  const TestCaseExecutor(this._testCaseList);
 
-  final List<TestCase<T>> testCaseList;
+  /// list of test cases of type T that the executor runs
+  final List<TestCase<T>> _testCaseList;
 
+  /// runs the list of test cases sequentially by first assembling, acting and then asserting for the specfic test case
   void run() {
-    for (var _testCase in testCaseList) {
+    for (var _testCase in _testCaseList) {
       T _a;
       _a = _testCase.assembler();
       _testCase.actors.forEach((actorFunc) {
@@ -56,13 +58,22 @@ class TestCaseExecutor<T> {
 /// ]
 /// ````
 class TestCase<T> {
-  const TestCase({this.description, this.assembler, this.actors, this.matchers})
-      : assert(description != null),
-        assert(assembler != null),
-        assert(actors != null),
-        assert(matchers != null);
+  const TestCase({
+    required this.description,
+    required this.assembler,
+    required this.actors,
+    required this.matchers,
+  });
+
+  /// description for the testcase to be shown inside test outputs
   final String description;
+
+  /// should be a function that builds the unit to be tested and returns it
   final T Function() assembler;
+
+  /// list of functions that act upon the unit and return the unit afterwards
   final List<T Function(T)> actors;
+
+  /// assertions the acted upon unit has to tested against
   final List<dynamic Function(T)> matchers;
 }
